@@ -18,7 +18,7 @@
 ```
 접속 : http://localhost:8080
 
-##2주차-연습문제
+## 2주차-연습문제
 
 <img width="360" height="162" alt="스크린샷 2026-09-09 133103" src="https://github.com/user-attachments/assets/d7ea6ab8-7e1d-4dc4-82ed-6ec691017f6a" />
 <img width="1912" height="722" alt="자바웹 2주차 연습문제" src="https://github.com/user-attachments/assets/8c820579-90bb-4778-a5ba-d667687720ac" />
