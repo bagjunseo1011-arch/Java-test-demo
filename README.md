@@ -2,6 +2,32 @@
 
 미디어소프트웨어학과 20230990 박준서
 
+## 4주차 - 데이터베이스 연동 및 테스트 완료
+
+MySQL 8.0 + Spring Data JPA를 연동하고, 프로젝트를 계층별 패키지 구조로 바꿨습니다.
+
+- [TestDB.java : 엔티티 (domain)](src/main/java/com/example/demo/model/domain/TestDB.java)
+- [TestRepository.java : 리포지토리 (repository)](src/main/java/com/example/demo/model/repository/TestRepository.java)
+- [TestService.java : 서비스 (service)](src/main/java/com/example/demo/model/service/TestService.java)
+- [DemoController.java : 컨트롤러 (controller, /testdb 추가)](src/main/java/com/example/demo/controller/DemoController.java)
+- [testdb.html : th:each로 사용자 목록 출력](src/main/resources/templates/testdb.html)
+
+### 4주차 작업 내용
+- 의존성 추가 : Spring Data JPA, MySQL 커넥터(mysql-connector-j), Lombok
+- `application.properties`에 MySQL 접속 정보 추가 (DB : `spring`, 포트 3306, `ddl-auto=update`)
+- 패키지 구조 변경 : `controller` / `model/domain` / `model/repository` / `model/service`
+- 서버 실행 시 JPA가 `testdb` 테이블 자동 생성 확인 (`HikariPool-1 - Start completed`)
+- `findAll()`로 전체 사용자 조회 후 `th:each`로 표 출력
+- 연습문제 : 엔티티에 나이(`age`), 성별(`gender`) 컬럼 추가 → INSERT로 사용자 4명 입력 → 표 출력
+
+### DB 비밀번호 설정 (clone 후 실행 시)
+비밀번호는 공개 저장소에 올라가지 않도록 `.gitignore` 처리된 파일에 따로 둡니다.
+`src/main/resources/secret.properties` 파일을 만들고 아래 한 줄을 넣으세요.
+
+```
+spring.datasource.password=본인_MySQL_root_비밀번호
+```
+
 ## 3주차 - 포트폴리오 작성하기(프론트) 완료
 
 부트스트랩 5 기반 TemplateMo 578 First Portfolio 템플릿을 Spring Boot 프로젝트에 적용했습니다.
@@ -33,6 +59,7 @@
 - Spring Boot 4.1.1 / Java 21 / Gradle
 - Thymeleaf 템플릿 엔진, 내장 Tomcat 8080 포트
 - Bootstrap 5.1.3 (TemplateMo 578 First Portfolio)
+- MySQL 8.0 / Spring Data JPA (Hibernate) / Lombok
 
 ## 실행
 
