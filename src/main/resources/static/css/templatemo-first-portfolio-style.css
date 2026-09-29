@@ -23,7 +23,7 @@ https://templatemo.com/tm-578-first-portfolio
   --body-font-family:             'DM Sans', sans-serif;
 
   --h1-font-size:                 62px;
-  --h2-font-size:                 48px;
+  --h2-font-size:                 46px;
   --h3-font-size:                 36px;
   --h4-font-size:                 32px;
   --h5-font-size:                 24px;
@@ -505,7 +505,10 @@ strong {
 }
 
 .hero-image-wrap {
-  background: var(--white-color);
+  /* 원본은 인물 사진 뒤에 깔리는 흰 원 장식.
+     캐릭터 이미지에서는 머리 뒤 후드처럼 보여서 배경만 끔.
+     되돌리려면 아래를 var(--white-color) 로. */
+  background: transparent;
   border-radius: 100%;
   width: 350px;
   height: 350px;
