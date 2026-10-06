@@ -2,6 +2,39 @@
 
 미디어소프트웨어학과 20230990 박준서
 
+## 5주차 - 로그인/로그아웃, 암호화 완료
+
+Spring Security 7.1로 세션 기반 로그인/로그아웃을 구현하고, 비밀번호를 BCrypt로 해시해서 저장합니다.
+
+- [SecurityConfig.java : 접근 규칙, 폼 로그인, 로그아웃, 로그인 상태 유지](src/main/java/com/example/demo/config/SecurityConfig.java)
+- [MemberController.java : 로그인·회원가입 요청](src/main/java/com/example/demo/controller/MemberController.java)
+- [Member.java : 회원 엔티티](src/main/java/com/example/demo/model/domain/Member.java)
+- [MemberForm.java : 회원가입 DTO](src/main/java/com/example/demo/model/dto/MemberForm.java)
+- [MemberRepository.java : 회원 조회·중복 확인](src/main/java/com/example/demo/model/repository/MemberRepository.java)
+- [MemberService.java : 가입(BCrypt 암호화), 로그인 조회(UserDetailsService)](src/main/java/com/example/demo/model/service/MemberService.java)
+- [login.html](src/main/resources/templates/login.html) / [signup.html](src/main/resources/templates/signup.html) / [index.html : 네비게이션 로그인 버튼](src/main/resources/templates/index.html)
+
+### 5주차 작업 내용
+- 의존성 추가 : `spring-boot-starter-security`, `thymeleaf-extras-springsecurity6`
+- 메인·상세·로그인·가입 페이지와 정적 리소스는 누구나 접근, `/testdb`(회원목록)는 로그인 필요
+- 회원가입 : 아이디 중복 확인 → 비밀번호 BCrypt 해시(`$2a$10$...`, 60자) → `role=USER`로 저장
+- 로그인 : `loadUserByUsername()`만 구현하고 비밀번호 비교는 시큐리티가 처리, 성공 시 원래 가려던 페이지로 복귀
+- 로그아웃 : POST `/logout` (CSRF 보호), 세션·쿠키 삭제
+- 네비게이션 : 비로그인 시 로그인/회원가입, 로그인 시 `아이디님 + 로그아웃` (`sec:authorize`)
+- DB 계정 정보를 `application-secret.properties`로 분리 (`.gitignore` 처리)
+- 연습문제 ① 로그인 상태 유지 : `rememberMe()` 7일, 브라우저를 닫아도 로그인 유지
+- 연습문제 ② 비밀번호 확인 : 불일치 시 "비밀번호가 일치하지 않습니다." 출력, DB에 저장 안 함
+
+### 비밀 설정 파일 (clone 후 실행 시)
+DB 계정과 remember-me 키는 공개 저장소에 올라가지 않도록 `.gitignore` 처리된 파일에 둡니다.
+`src/main/resources/application-secret.properties` 파일을 만들고 아래 내용을 넣으세요.
+
+```
+spring.datasource.username=root
+spring.datasource.password=본인_MySQL_root_비밀번호
+app.remember-me-key=임의의_긴_문자열
+```
+
 ## 4주차 - 데이터베이스 연동 및 테스트 완료
 
 MySQL 8.0 + Spring Data JPA를 연동하고, 프로젝트를 계층별 패키지 구조로 바꿨습니다.
@@ -20,13 +53,7 @@ MySQL 8.0 + Spring Data JPA를 연동하고, 프로젝트를 계층별 패키지
 - `findAll()`로 전체 사용자 조회 후 `th:each`로 표 출력
 - 연습문제 : 엔티티에 나이(`age`), 성별(`gender`) 컬럼 추가 → INSERT로 사용자 4명 입력 → 표 출력
 
-### DB 비밀번호 설정 (clone 후 실행 시)
-비밀번호는 공개 저장소에 올라가지 않도록 `.gitignore` 처리된 파일에 따로 둡니다.
-`src/main/resources/secret.properties` 파일을 만들고 아래 한 줄을 넣으세요.
-
-```
-spring.datasource.password=본인_MySQL_root_비밀번호
-```
+DB 비밀번호는 4주차부터 별도 파일로 분리했습니다. 5주차부터 파일 이름이 `application-secret.properties`로 바뀌었습니다 (위 5주차 설명 참고).
 
 ## 3주차 - 포트폴리오 작성하기(프론트) 완료
 
@@ -60,6 +87,7 @@ spring.datasource.password=본인_MySQL_root_비밀번호
 - Thymeleaf 템플릿 엔진, 내장 Tomcat 8080 포트
 - Bootstrap 5.1.3 (TemplateMo 578 First Portfolio)
 - MySQL 8.0 / Spring Data JPA (Hibernate) / Lombok
+- Spring Security 7.1 (세션 로그인, BCrypt)
 
 ## 실행
 

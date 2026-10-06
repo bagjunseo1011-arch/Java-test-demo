@@ -36,5 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 
-### DB 비밀번호 (4주차) ###
-src/main/resources/secret.properties
+### DB 계정 정보 (5주차) ###
+application-secret.properties

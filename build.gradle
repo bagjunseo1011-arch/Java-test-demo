@@ -26,6 +26,10 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	// 5주차 : 스프링 시큐리티 (로그인/로그아웃, BCrypt 암호화)
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	// 5주차 : 타임리프에서 로그인 상태(sec:authorize) 사용
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
