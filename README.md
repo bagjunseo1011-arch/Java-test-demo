@@ -2,6 +2,28 @@
 
 미디어소프트웨어학과 20230990 박준서
 
+## 6주차 - 권한(ROLE) 접근 제어, 관리자 페이지 분리 완료
+
+USER / MANAGER / ADMIN 역할(RBAC)로 화면·URL·메서드 세 곳에서 권한을 검사하고, 관리자 페이지를 `/admin/**`로 분리했습니다.
+
+- [AdminController.java : 관리자 전용 (회원 목록, 권한 변경, 삭제)](src/main/java/com/example/demo/controller/AdminController.java)
+- [SecurityConfig.java : `/admin/**` 관리자만, `@EnableMethodSecurity`](src/main/java/com/example/demo/config/SecurityConfig.java)
+- [MemberController.java : `/mypage` 추가](src/main/java/com/example/demo/controller/MemberController.java)
+- [MemberService.java : 조회, 권한 변경·삭제(`@PreAuthorize`)](src/main/java/com/example/demo/model/service/MemberService.java)
+- [mypage.html](src/main/resources/templates/mypage.html) / [admin/members.html](src/main/resources/templates/admin/members.html) / [error/403.html](src/main/resources/templates/error/403.html) / [index.html : 권한별 메뉴, 권한 배지](src/main/resources/templates/index.html)
+
+### 6주차 작업 내용
+- 접근 제어 3단계 : ① 화면 `sec:authorize`(보이기/숨기기) ② URL `requestMatchers`(1차 잠금) ③ 메서드 `@PreAuthorize`(2차 잠금)
+- 내 정보(`/mypage`) : URL로 id를 받지 않고 로그인 아이디(`Principal`)로 조회 → 번호 조작(IDOR) 차단
+- 관리자 계정 : 회원가입으로 만든 뒤 SQL로 `role`만 `ADMIN`으로 변경 (평문 비밀번호 INSERT 금지)
+- 권한 변경은 화이트리스트에 있는 값만 허용, 변경·삭제 후 PRG 패턴(redirect + flash 메시지)
+- 권한이 없으면 `error/403.html` (아이디, 내 권한, 요청 주소 표시)
+- 이중 잠금 실험 : URL 규칙을 주석 처리해도 `@PreAuthorize`가 변경·삭제를 403으로 차단 (실험 후 복구)
+- 연습문제 ① 관리자 본인 보호 : 자기 자신의 권한 변경·삭제 거부
+- 연습문제 ② MANAGER 권한 추가 : 부여 가능, `/testdb`는 ADMIN·MANAGER만 (USER 403), 회원목록 메뉴도 USER에게 숨김
+
+> 관리자 계정(admin / 1234)은 실습용입니다. 실제 서비스에서는 강한 비밀번호와 별도 관리가 필요합니다.
+
 ## 5주차 - 로그인/로그아웃, 암호화 완료
 
 Spring Security 7.1로 세션 기반 로그인/로그아웃을 구현하고, 비밀번호를 BCrypt로 해시해서 저장합니다.
