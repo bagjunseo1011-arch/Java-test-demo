@@ -2,6 +2,50 @@
 
 미디어소프트웨어학과 20230990 박준서
 
+## 7주차 - 회원 관리 REST API(JSON) 완료
+
+지난주 회원 관리 기능을 JSON API로 다시 만들고, Postman(Basic 인증)과 화면(fetch + 세션 쿠키) 두 방식으로 같은 API를 호출합니다.
+
+- [MemberApiController.java : `/api/hello`, `/api/me`](src/main/java/com/example/demo/controller/MemberApiController.java)
+- [AdminApiController.java : 관리자 회원 API (조회·검색·등록·권한 변경·삭제)](src/main/java/com/example/demo/controller/AdminApiController.java)
+- [ApiExceptionHandler.java : 오류 처리 한 곳에 모으기 (`@RestControllerAdvice`)](src/main/java/com/example/demo/controller/ApiExceptionHandler.java)
+- [MemberResponse.java : 응답 DTO (password 제외)](src/main/java/com/example/demo/model/dto/MemberResponse.java) / [RoleRequest.java : 권한 변경 요청 DTO](src/main/java/com/example/demo/model/dto/RoleRequest.java)
+- [SecurityConfig.java : Basic 인증, `/api/**` CSRF 제외, 로그인 안 한 API 요청은 401](src/main/java/com/example/demo/config/SecurityConfig.java)
+- [admin/members-api.html : API 버전 회원 관리 화면](src/main/resources/templates/admin/members-api.html)
+
+### 7주차 작업 내용
+- `@RestController` : 화면 이름 대신 객체를 반환하면 JSON으로 자동 변환
+- 엔티티를 그대로 반환하면 비밀번호 해시까지 나감 → 응답 DTO(`MemberResponse`, record)로 필요한 값만
+- 인증 : 브라우저는 세션 쿠키, Postman은 요청마다 Basic 인증. 로그인 안 한 API 요청은 로그인 화면(302) 대신 401
+- REST 주소 규칙 : 주소에는 대상만, 할 일은 HTTP 메서드(GET·POST·PATCH·DELETE)로 구분
+- 상태 코드 : 200 조회·수정 / 201 등록(+Location) / 204 삭제 / 400 잘못된 요청 / 401 인증 없음 / 403 권한 없음 / 404 대상 없음
+- 서비스의 보안 검사(`@PreAuthorize`, 권한 화이트리스트, 본인 보호)는 화면·API 모두 그대로 적용
+- 연습문제 ① 회원 검색 : `GET /api/admin/members?keyword=student` (아이디·이름에 검색어 포함)
+- 연습문제 ② 오류 처리 한 곳에 모으기 : 컨트롤러의 반복 try-catch 제거 → `@RestControllerAdvice`. 깨진 JSON도 서버 내부 정보(trace) 없이 400
+
+### API 테스트 결과 (Postman과 같은 요청을 curl로 실행)
+
+| # | 요청 | 계정 | Body | 결과 |
+|---|---|---|---|---|
+| 1 | `GET /api/hello` | 없음 | | 200 `{"message":"안녕하세요, REST API!", "time":...}` |
+| 2 | `GET /api/me` | 없음 | | 401 (본문 없음) |
+| 3 | `GET /api/me` | student1 | | 200 `{"id","username","name","role"}` (password 없음) |
+| 4 | `GET /api/admin/members` | admin | | 200 회원 배열 |
+| 5 | `GET /api/admin/members/9999` | admin | | 404 |
+| 6 | `GET /api/admin/members` | student1 / MANAGER | | 403 |
+| 7 | `POST /api/admin/members` | admin | `{"username":"postman1","password":"1234","passwordConfirm":"1234","name":"포스트맨"}` | 201 + `Location: /api/admin/members/{id}` |
+| 8 | 같은 요청 한 번 더 | admin | 위와 같음 | 400 `{"error":"이미 사용 중인 아이디입니다."}` |
+| 9 | `POST /api/admin/members` | admin | `{"username":"x"}` | 400 `{"error":"아이디, 비밀번호, 이름은 필수입니다."}` |
+| 10 | `POST` + `"role":"ADMIN"` 끼워넣기 | admin | | 201, 그래도 `role: USER` |
+| 11 | `PATCH /api/admin/members/{id}/role` | admin | `{"role":"ADMIN"}` | 200 바뀐 회원 |
+| 12 | `PATCH /api/admin/members/{id}/role` | admin | `{"role":"SUPER"}` | 400 허용되지 않는 권한 |
+| 13 | `PATCH /api/admin/members/{admin id}/role` | admin | `{"role":"USER"}` | 400 본인 변경 불가 |
+| 14 | `DELETE /api/admin/members/{id}` | student1 | | 403 |
+| 15 | `DELETE /api/admin/members/{id}` | admin | | 204 |
+| 16 | `GET /api/admin/members?keyword=student` | admin | | 200 student1, student2만 |
+
+Postman에서 실행할 때 : Authorization → Basic Auth(아이디·비밀번호), Body → raw → JSON.
+
 ## 6주차 - 권한(ROLE) 접근 제어, 관리자 페이지 분리 완료
 
 USER / MANAGER / ADMIN 역할(RBAC)로 화면·URL·메서드 세 곳에서 권한을 검사하고, 관리자 페이지를 `/admin/**`로 분리했습니다.

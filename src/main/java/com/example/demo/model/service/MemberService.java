@@ -1,6 +1,7 @@
 package com.example.demo.model.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -28,6 +29,10 @@ public class MemberService implements UserDetailsService { // 로그인을 위�
 	private PasswordEncoder passwordEncoder;
 
 	public Member signup(MemberForm form) { // 회원가입
+		// [7주차] 빈 값 검사 : JSON(Postman) 요청에는 HTML 의 required 검사가 없다
+		if (isBlank(form.getUsername()) || isBlank(form.getPassword()) || isBlank(form.getName())) {
+			throw new IllegalArgumentException("아이디, 비밀번호, 이름은 필수입니다.");
+		}
 		// 연습문제 : 비밀번호 확인 검증 (다르면 저장하지 않음)
 		if (!form.getPassword().equals(form.getPasswordConfirm())) {
 			throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
@@ -67,8 +72,21 @@ public class MemberService implements UserDetailsService { // 로그인을 위�
 		return memberRepository.findAll(Sort.by("id"));
 	}
 
+	// [7주차] 회원 1명 (없으면 Optional.empty() → 컨트롤러에서 404)
+	public Optional<Member> findById(Long id) {
+		return memberRepository.findById(id);
+	}
+
+	// [7주차 연습문제 ①] 아이디나 이름에 검색어가 들어간 회원 (검색어가 없으면 전체)
+	public List<Member> search(String keyword) {
+		if (isBlank(keyword)) {
+			return findAll();
+		}
+		return memberRepository.findByUsernameContainingOrNameContaining(keyword, keyword, Sort.by("id"));
+	}
+
 	@PreAuthorize("hasRole('ADMIN')") // 관리자만 실행 가능 (2차 잠금)
-	public void changeRole(Long id, String role) { // 권한 변경
+	public Member changeRole(Long id, String role) { // 권한 변경 ([7주차] void → Member : 바뀐 회원을 돌려준다)
 		if (!ROLES.contains(role)) { // 허용된 권한만
 			throw new IllegalArgumentException("허용되지 않는 권한입니다 : " + role);
 		}
@@ -76,7 +94,7 @@ public class MemberService implements UserDetailsService { // 로그인을 위�
 				.orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 		checkNotSelf(member);
 		member.setRole(role);
-		memberRepository.save(member); // UPDATE (id 가 있으면 수정)
+		return memberRepository.save(member); // UPDATE (id 가 있으면 수정)
 	}
 
 	@PreAuthorize("hasRole('ADMIN')") // 관리자만 실행 가능 (2차 잠금)
@@ -93,5 +111,9 @@ public class MemberService implements UserDetailsService { // 로그인을 위�
 		if (member.getUsername().equals(me)) {
 			throw new IllegalArgumentException("자기 자신의 권한 변경·삭제는 할 수 없습니다.");
 		}
+	}
+
+	private boolean isBlank(String value) { // [7주차] null 이거나 공백뿐이면 true
+		return value == null || value.isBlank();
 	}
 }
